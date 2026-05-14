@@ -409,38 +409,23 @@ function makeForm(containerId){
           "Credit Score": state.credit!=null ? CREDIT[state.credit] : "",
           "Income Type": state.income!=null ? INCOME[state.income] : "",
           "Province": state.province || "",
-          "Submitted From": window.location.href,
-          "User Agent": navigator.userAgent
+          "Submitted From": window.location.href
         };
-        // Use formsubmit.co AJAX endpoint — works inside Instagram/Facebook/TikTok in-app browsers
-        // (no cross-origin navigation, no redirect chain, no captcha interstitial).
         try {
-          const res = await fetch("https://formsubmit.co/ajax/zulfiqarcorporation@gmail.com", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Accept": "application/json" },
-            body: JSON.stringify(payload)
+          const f = document.createElement("form");
+          f.method = "POST";
+          f.action = "https://formsubmit.co/zulfiqarcorporation@gmail.com";
+          Object.entries(payload).forEach(([k,v])=>{
+            const i=document.createElement("input"); i.type="hidden"; i.name=k; i.value=v; f.appendChild(i);
           });
-          if(!res.ok) throw new Error("HTTP " + res.status);
+          document.body.appendChild(f);
+          f.submit();
           state.done = true;
         } catch(err){
-          // Fallback: classic form POST in a new tab so IAB at least doesn't lose the page
-          try {
-            const f = document.createElement("form");
-            f.method = "POST";
-            f.action = "https://formsubmit.co/zulfiqarcorporation@gmail.com";
-            f.target = "_blank";
-            Object.entries(payload).forEach(([k,v])=>{
-              const i=document.createElement("input"); i.type="hidden"; i.name=k; i.value=String(v); f.appendChild(i);
-            });
-            document.body.appendChild(f);
-            f.submit();
-            state.done = true;
-          } catch(e2){
-            alert("Something went wrong sending your request. Please call 613-879-4768.");
-            n.disabled = false;
-            n.textContent = "Get My Free Quote →";
-            return;
-          }
+          alert("Something went wrong sending your request. Please call 613-879-4768.");
+          n.disabled = false;
+          n.textContent = "Get My Free Quote →";
+          return;
         }
       }
       render();
