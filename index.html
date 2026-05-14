@@ -399,9 +399,6 @@ function makeForm(containerId){
         n.disabled = true;
         n.textContent = "Sending…";
         const payload = {
-          _subject: "New Mortgage Lead - CanadaMortgageApproval.ca",
-          _template: "table",
-          _captcha: "false",
           "Full Name": ((state.firstName||"") + " " + (state.lastName||"")).trim(),
           "Email": state.email || "",
           "Phone": state.phone || "",
@@ -412,15 +409,22 @@ function makeForm(containerId){
           "Submitted From": window.location.href
         };
         try {
-          const f = document.createElement("form");
-          f.method = "POST";
-          f.action = "https://formsubmit.co/zulfiqarcorporation@gmail.com";
-          Object.entries(payload).forEach(([k,v])=>{
-            const i=document.createElement("input"); i.type="hidden"; i.name=k; i.value=v; f.appendChild(i);
+          const response = await fetch("https://api.web3forms.com/submit", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify({
+              access_key: "0c89261f-9112-4355-8e84-0a9ab39a1659",
+              subject: "New Mortgage Lead - CanadaMortgageApproval.ca",
+              from_name: "CanadaMortgageApproval.ca",
+              ...payload
+            })
           });
-          document.body.appendChild(f);
-          f.submit();
-          state.done = true;
+          const result = await response.json();
+          if (result.success) {
+            state.done = true;
+          } else {
+            throw new Error(result.message || "Submission failed");
+          }
         } catch(err){
           alert("Something went wrong sending your request. Please call 613-879-4768.");
           n.disabled = false;
